@@ -1,8 +1,9 @@
-import 'package:flame/game.dart';
 import 'package:flame/components.dart';
+import 'package:flame/game.dart';
+import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flame_rive/flame_rive.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart' hide Draggable;
 import 'package:rive/rive.dart';
 
 void main() {
@@ -27,7 +28,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class RiveExampleGame extends FlameGame {
+class RiveExampleGame extends FlameGame with HasDraggableComponents {
   @override
   Future<void>? onLoad() async {
     camera.viewport = FixedResolutionViewport(Vector2(3185, 2758));
@@ -61,7 +62,7 @@ class RiveExampleGame extends FlameGame {
   }
 }
 
-class ArcherComponent extends RiveComponent {
+class ArcherComponent extends RiveComponent with Draggable {
   ArcherComponent({
     required Artboard artboard,
     required Vector2 position,
@@ -87,4 +88,15 @@ class ArcherComponent extends RiveComponent {
     }
     return super.onLoad();
   }
+
+  @override
+  bool onDragUpdate(int pointerId, DragUpdateInfo info) {
+    final input  = _pullFactorInput;
+    if(input == null) return true;
+    final currentValue = input.value;
+    final updated = (currentValue + info.delta.game.x * -0.1).clamp(0.0, 100.0);
+    input.value = updated;
+    return true;
+  }
+
 }
